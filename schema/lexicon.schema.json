@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Japanese TTS Lexicon Map",
+  "type": "object",
+  "required": ["format", "domain", "version", "entries"],
+  "properties": {
+    "format": { "const": "japanese-tts-lexicon-map@1" },
+    "domain": { "type": "string" },
+    "version": { "type": "string" },
+    "entries": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    }
+  },
+  "additionalProperties": false
+}
