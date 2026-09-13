@@ -3,6 +3,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const dataRoot = path.join(root, "data");
+const overrideFile = path.join(dataRoot, "custom", "user-overrides.tsv");
 
 function walk(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -11,7 +12,14 @@ function walk(dir) {
   });
 }
 
-const files = walk(dataRoot).filter((p) => p.endsWith(".json") || p.endsWith(".tsv"));
+// 通常辞書を先に、user-overrides.tsv を必ず最後に読む。
+const files = walk(dataRoot)
+  .filter((p) => p.endsWith(".json") || p.endsWith(".tsv"))
+  .sort((a, b) => {
+    if (a === overrideFile) return 1;
+    if (b === overrideFile) return -1;
+    return a.localeCompare(b);
+  });
 const merged = {};
 const sources = {};
 
@@ -24,10 +32,10 @@ function normalizeReading(reading) {
     .trim();
 }
 
-function add(surface, reading, file) {
+function add(surface, reading, file, allowOverride = false) {
   if (!surface || !reading) return;
   const normalizedReading = normalizeReading(reading);
-  if (merged[surface] && merged[surface] !== normalizedReading) {
+  if (merged[surface] && merged[surface] !== normalizedReading && !allowOverride) {
     throw new Error(`conflict: ${surface}: ${merged[surface]} / ${normalizedReading} (${sources[surface]} / ${file})`);
   }
   merged[surface] = normalizedReading;
@@ -36,12 +44,13 @@ function add(surface, reading, file) {
 
 for (const file of files) {
   if (file.endsWith("contextual-readings.json")) continue;
+  const allowOverride = file === overrideFile;
 
   if (file.endsWith(".tsv")) {
     for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
       if (!line || line.startsWith("#")) continue;
       const [surface, reading] = line.split("\t");
-      add(surface, reading, file);
+      add(surface, reading, file, allowOverride);
     }
     continue;
   }
@@ -49,7 +58,7 @@ for (const file of files) {
   const obj = JSON.parse(fs.readFileSync(file, "utf8"));
   if (obj.format !== "japanese-tts-lexicon-map@1") continue;
   for (const [surface, reading] of Object.entries(obj.entries || {})) {
-    add(surface, reading, file);
+    add(surface, reading, file, allowOverride);
   }
 }
 
