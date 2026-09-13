@@ -1,0 +1,35 @@
+{
+  "format": "japanese-tts-lexicon-tests@1",
+  "cases": [
+    {
+      "input": "日本で最も高い山は富士山です。",
+      "mustContain": "ふじさん",
+      "mustNotContain": "ふじやま"
+    },
+    {
+      "input": "血税を無駄にしない。",
+      "mustContain": "けつぜい",
+      "mustNotContain": "ちぜい"
+    },
+    {
+      "input": "英虞湾では真珠の養殖がさかんです。",
+      "mustContain": "あごわん"
+    },
+    {
+      "input": "八幡製鉄所は1901年に操業を開始しました。",
+      "mustContain": "やはたせいてつしょ"
+    },
+    {
+      "input": "神通川流域でイタイイタイ病が発生しました。",
+      "mustContain": "じんづうがわ"
+    },
+    {
+      "input": "北海道東部には根釧台地があります。",
+      "mustContain": "こんせんだいち"
+    },
+    {
+      "input": "群馬県の嬬恋村では高原野菜がさかんです。",
+      "mustContain": "つまごいむら"
+    }
+  ]
+}
