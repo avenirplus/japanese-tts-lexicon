@@ -1,0 +1,35 @@
+name: Sync Juken Quest overrides
+
+on:
+  schedule:
+    - cron: '15 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch approved queue
+        run: curl -fsSL 'https://juken-quest-os.avenirplus.workers.dev/__tts/publish-queue' -o /tmp/juken-tts-queue.json
+      - name: Merge approved readings
+        run: node scripts/import-juken-queue.mjs /tmp/juken-tts-queue.json
+      - name: Build and test
+        run: npm test
+      - name: Commit only when changed
+        run: |
+          if git diff --quiet -- data/custom/user-overrides.tsv dist/lexicon.json; then
+            echo 'No new approved readings'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/custom/user-overrides.tsv dist/lexicon.json
+          git commit -m 'Sync approved Juken Quest TTS readings [skip ci]'
+          git push
