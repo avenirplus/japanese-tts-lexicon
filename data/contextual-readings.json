@@ -1,0 +1,18 @@
+{
+  "format": "japanese-tts-context@1",
+  "version": "1.0.0",
+  "entries": [
+    {
+      "surface": "日本橋",
+      "reading": "にほんばし",
+      "context": "東京都中央区",
+      "status": "verified"
+    },
+    {
+      "surface": "日本橋",
+      "reading": "にっぽんばし",
+      "context": "大阪市中央区・浪速区",
+      "status": "verified"
+    }
+  ]
+}
