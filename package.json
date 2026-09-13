@@ -1,0 +1,10 @@
+{
+  "name": "japanese-tts-lexicon",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node scripts/test.mjs"
+  }
+}
