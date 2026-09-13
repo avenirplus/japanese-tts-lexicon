@@ -15,12 +15,22 @@ const files = walk(dataRoot).filter((p) => p.endsWith(".json") || p.endsWith(".t
 const merged = {};
 const sources = {};
 
+// TTS向けの読みは、資料上の区切り記号を発音させない。
+// 例: はんしん・あわじだいしんさい -> はんしんあわじだいしんさい
+function normalizeReading(reading) {
+  return String(reading)
+    .normalize("NFKC")
+    .replace(/[・･\s]+/g, "")
+    .trim();
+}
+
 function add(surface, reading, file) {
   if (!surface || !reading) return;
-  if (merged[surface] && merged[surface] !== reading) {
-    throw new Error(`conflict: ${surface}: ${merged[surface]} / ${reading} (${sources[surface]} / ${file})`);
+  const normalizedReading = normalizeReading(reading);
+  if (merged[surface] && merged[surface] !== normalizedReading) {
+    throw new Error(`conflict: ${surface}: ${merged[surface]} / ${normalizedReading} (${sources[surface]} / ${file})`);
   }
-  merged[surface] = reading;
+  merged[surface] = normalizedReading;
   sources[surface] = path.relative(root, file);
 }
 
@@ -52,7 +62,7 @@ fs.writeFileSync(
   path.join(root, "dist/lexicon.json"),
   JSON.stringify({
     format: "japanese-tts-lexicon-map@1",
-    version: "1.0.0",
+    version: "1.1.0",
     count: Object.keys(ordered).length,
     entries: ordered
   }, null, 2)
